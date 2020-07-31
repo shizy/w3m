@@ -2118,11 +2118,8 @@ link_hint_menu(Buffer *buf)
 {
     if (buf == NULL || buf->href == NULL || buf->href->nanchor == 0) return NULL;
 
-    char input[5] = "\0";
-    int inputs = 0,
-        filteredHints = 0;
-
     int visibleHints = 0;
+
     for (unsigned int i = 0; i < buf->href->nanchor; i++) {
         int x = buf->href->anchors[i].start.pos,
             y = buf->href->anchors[i].start.line;
@@ -2130,10 +2127,14 @@ link_hint_menu(Buffer *buf)
         visibleHints++;
     }
 
-    int hintChars = floor(log10(visibleHints) + 1);
+    int inputs = 0,
+        filteredHints = 0,
+        hintChars = floor(log10(visibleHints) + 1);
+
+    char input[hintChars];
     Anchor *a = New_N(Anchor *, 1);
 
-    while (inputs < 5) {
+    while (1) {
     
         displayBuffer(Currentbuf, B_FORCE_REDRAW);
         filteredHints = 0;
@@ -2144,15 +2145,10 @@ link_hint_menu(Buffer *buf)
                 y = buf->href->anchors[i].start.line;
             if (buf->href->anchors[i].slave || x >= buf->width || y >= buf->height - 1) continue;
 
-            char chord[5] = "\0",
-                 combo[5] = "\0",
-                 *chint;
+            char *h = Sprintf("%0.*d", hintChars, i)->ptr;
 
-            strncpy(chord, Sprintf("%0.*d", hintChars, i)->ptr, inputs);
-            strncpy(combo, input, inputs);
-
-            if (input[0] == '\0' || strstr(chord, combo) != NULL) {
-                mvaddstr(y - 1, x, Sprintf("[%0.*d]", hintChars, i)->ptr);
+            if (inputs == 0 || strncmp(h, input, inputs) == 0) {
+                mvaddstr(y - 1, x, Sprintf("[%s]", h)->ptr);
                 a->hseq = i;
                 filteredHints++;
             }
@@ -2160,7 +2156,7 @@ link_hint_menu(Buffer *buf)
         G_end;
         refresh();
 
-        if (filteredHints == 0) return NULL;
+        if (filteredHints == 0 || inputs > hintChars) break;
         if (filteredHints == 1) return a;
 
         input[inputs++] = getch();
