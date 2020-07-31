@@ -148,11 +148,16 @@ extern Anchor *accesskey_menu(Buffer *buf);
 extern void listMn(void);
 extern void movlistMn(void);
 extern Anchor *list_menu(Buffer *buf);
+extern void gotoHint(void);
+extern void jumpHint(void);
+extern Anchor *link_hint_menu(Buffer *buf);
 #else
 #define linkMn nulcmd
 #define accessKey nulcmd
 #define listMn nulcmd
 #define movlistMn nulcmd
+#define gotoHint nulcmd
+#define jumpHint nulcmd
 #endif
 extern void undoPos(void);
 extern void redoPos(void);

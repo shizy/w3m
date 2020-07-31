@@ -4481,6 +4481,17 @@ DEFUN(accessKey, ACCESSKEY, "Pop up accesskey menu")
     anchorMn(accesskey_menu, TRUE);
 }
 
+/* link hints */
+DEFUN(gotoHint, GOTO_HINT, "Link hints for visible hyperlinks to browse to")
+{
+    anchorMn(link_hint_menu, TRUE);
+}
+
+DEFUN(jumpHint, JUMP_HINT, "Link hint to navigate to visible hyperlink")
+{
+    anchorMn(link_hint_menu, FALSE);
+}
+
 /* list menu */
 DEFUN(listMn, LIST_MENU, "Pop up menu for hyperlinks to browse to")
 {

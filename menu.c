@@ -2113,4 +2113,60 @@ list_menu(Buffer *buf)
     return (key >= 0) ? ap[key] : NULL;
 }
 
+Anchor *
+link_hint_menu(Buffer *buf)
+{
+    if (buf == NULL || buf->href == NULL || buf->href->nanchor == 0) return NULL;
+
+    char input[5] = "\0";
+    int inputs = 0,
+        filteredHints = 0;
+
+    int visibleHints = 0;
+    for (unsigned int i = 0; i < buf->href->nanchor; i++) {
+        int x = buf->href->anchors[i].start.pos,
+            y = buf->href->anchors[i].start.line;
+        if (buf->href->anchors[i].slave || x >= buf->width || y >= buf->height - 1) continue;
+        visibleHints++;
+    }
+
+    int hintChars = floor(log10(visibleHints) + 1);
+    Anchor *a = New_N(Anchor *, 1);
+
+    while (inputs < 5) {
+    
+        displayBuffer(Currentbuf, B_FORCE_REDRAW);
+        filteredHints = 0;
+
+        G_start;
+        for (unsigned int i = 0; i < buf->href->nanchor; i++) {
+            int x = buf->href->anchors[i].start.pos,
+                y = buf->href->anchors[i].start.line;
+            if (buf->href->anchors[i].slave || x >= buf->width || y >= buf->height - 1) continue;
+
+            char chord[5] = "\0",
+                 combo[5] = "\0",
+                 *chint;
+
+            strncpy(chord, Sprintf("%0.*d", hintChars, i)->ptr, inputs);
+            strncpy(combo, input, inputs);
+
+            if (input[0] == '\0' || strstr(chord, combo) != NULL) {
+                mvaddstr(y - 1, x, Sprintf("[%0.*d]", hintChars, i)->ptr);
+                a->hseq = i;
+                filteredHints++;
+            }
+        }
+        G_end;
+        refresh();
+
+        if (filteredHints == 0) return NULL;
+        if (filteredHints == 1) return a;
+
+        input[inputs++] = getch();
+    }
+
+    return NULL;
+}
+
 #endif				/* USE_MENU */
