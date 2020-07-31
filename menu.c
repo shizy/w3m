@@ -2122,8 +2122,8 @@ link_hint_menu(Buffer *buf)
 
     for (unsigned int i = 0; i < buf->href->nanchor; i++) {
         int x = buf->href->anchors[i].start.pos,
-            y = buf->href->anchors[i].start.line;
-        if (buf->href->anchors[i].slave || x > buf->width || y > buf->height - 1) continue;
+            y = buf->href->anchors[i].start.line - buf->topLine->linenumber;
+        if (buf->href->anchors[i].slave || x > buf->width || y < 0 || y > buf->height - 2) continue;
         visibleHints++;
     }
 
@@ -2140,15 +2140,15 @@ link_hint_menu(Buffer *buf)
         filteredHints = 0;
 
         G_start;
-        for (unsigned int i = 0; i < buf->href->nanchor; i++) {
+        for (unsigned int i = 0, v = 0; i < buf->href->nanchor; i++) {
             int x = buf->href->anchors[i].start.pos,
-                y = buf->href->anchors[i].start.line;
-            if (buf->href->anchors[i].slave || x > buf->width || y > buf->height - 1) continue;
+                y = buf->href->anchors[i].start.line - buf->topLine->linenumber;
+            if (buf->href->anchors[i].slave || x > buf->width || y < 0 || y > buf->height - 2) continue;
 
-            char *h = Sprintf("%0.*d", hintChars, i)->ptr;
+            char *h = Sprintf("%0.*d", hintChars, v++)->ptr;
 
             if (inputs == 0 || strncmp(h, input, inputs) == 0) {
-                mvaddstr(y - 1, x, Sprintf("[%s]", h)->ptr);
+                mvaddstr(y, x, Sprintf("[%s]", h)->ptr);
                 a->hseq = i;
                 filteredHints++;
             }
