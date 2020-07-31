@@ -2123,7 +2123,7 @@ link_hint_menu(Buffer *buf)
     for (unsigned int i = 0; i < buf->href->nanchor; i++) {
         int x = buf->href->anchors[i].start.pos,
             y = buf->href->anchors[i].start.line;
-        if (buf->href->anchors[i].slave || x >= buf->width || y >= buf->height - 1) continue;
+        if (buf->href->anchors[i].slave || x > buf->width || y > buf->height - 1) continue;
         visibleHints++;
     }
 
@@ -2143,7 +2143,7 @@ link_hint_menu(Buffer *buf)
         for (unsigned int i = 0; i < buf->href->nanchor; i++) {
             int x = buf->href->anchors[i].start.pos,
                 y = buf->href->anchors[i].start.line;
-            if (buf->href->anchors[i].slave || x >= buf->width || y >= buf->height - 1) continue;
+            if (buf->href->anchors[i].slave || x > buf->width || y > buf->height - 1) continue;
 
             char *h = Sprintf("%0.*d", hintChars, i)->ptr;
 
