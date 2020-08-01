@@ -4186,7 +4186,7 @@ cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
 
 /* go to specified URL */
 static void
-goURL0(char *prompt, int relative)
+goURL0(char *prompt, int relative, int blank)
 {
     char *url, *referer;
     ParsedURL p_url, *current;
@@ -4216,6 +4216,7 @@ goURL0(char *prompt, int relative)
 	    else
 		pushHist(hist, a_url);
 	}
+    if (blank) url = NULL;
 	url = inputLineHist(prompt, url, IN_URL, hist);
 	if (url != NULL)
 	    SKIP_BLANKS(url);
@@ -4253,7 +4254,12 @@ goURL0(char *prompt, int relative)
 
 DEFUN(goURL, GOTO, "Open specified document in a new buffer")
 {
-    goURL0("Goto URL: ", FALSE);
+    goURL0("Goto URL: ", FALSE, FALSE);
+}
+
+DEFUN(goBlank, GOTO_BLANK, "Open specified document in new buffer")
+{
+    goURL0("Goto URL: ", FALSE, TRUE);
 }
 
 DEFUN(goHome, GOTO_HOME, "Open home page in a new buffer")
@@ -4275,7 +4281,7 @@ DEFUN(goHome, GOTO_HOME, "Open home page in a new buffer")
 
 DEFUN(gorURL, GOTO_RELATIVE, "Go to relative address")
 {
-    goURL0("Goto relative URL: ", TRUE);
+    goURL0("Goto relative URL: ", TRUE, FALSE);
 }
 
 static void
@@ -6481,17 +6487,17 @@ DEFUN(tabA, TAB_LINK, "Follow current hyperlink in a new tab")
 }
 
 static void
-tabURL0(TabBuffer * tab, char *prompt, int relative)
+tabURL0(TabBuffer * tab, char *prompt, int relative, int blank)
 {
     Buffer *buf;
 
     if (tab == CurrentTab) {
-	goURL0(prompt, relative);
+	goURL0(prompt, relative, blank);
 	return;
     }
     _newT();
     buf = Currentbuf;
-    goURL0(prompt, relative);
+    goURL0(prompt, relative, blank);
     if (tab == NULL) {
 	if (buf != Currentbuf)
 	    delBuffer(buf);
@@ -6519,13 +6525,19 @@ tabURL0(TabBuffer * tab, char *prompt, int relative)
 DEFUN(tabURL, TAB_GOTO, "Open specified document in a new tab")
 {
     tabURL0(prec_num ? numTab(PREC_NUM) : NULL,
-	    "Goto URL on new tab: ", FALSE);
+	    "Goto URL on new tab: ", FALSE, FALSE);
+}
+
+DEFUN(tabBlank, TAB_GOTO_BLANK, "Open specified document in new tab")
+{
+    tabURL0(prec_num ? numTab(PREC_NUM) : NULL,
+	    "Goto URL on new tab: ", FALSE, TRUE);
 }
 
 DEFUN(tabrURL, TAB_GOTO_RELATIVE, "Open relative address in a new tab")
 {
     tabURL0(prec_num ? numTab(PREC_NUM) : NULL,
-	    "Goto relative URL on new tab: ", TRUE);
+	    "Goto relative URL on new tab: ", TRUE, FALSE);
 }
 
 static void
